@@ -544,4 +544,14 @@
       }, 300);
     }
   };
+
+
+  AblePlayer.prototype.addSeekEventHandler = function() {
+    var thisObj = this;
+    console.log(thisObj);
+    $(window).bind('able-seek', function(event, seekTime) {
+      thisObj.seekTo(seekTime);
+      });
+     };
+
 })(jQuery);

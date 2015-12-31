@@ -69,7 +69,15 @@
     else { 
       this.autoplay = false;
     }
-    
+
+  this.playerid = instances;
+    if (instances.playerid) instances.playerid();
+    //this should expose the player instances as required in #123
+    if (AblePlayer.playerid.pause) AblePlayer.playerid.pause();
+    //the same can be done with pause, play, initialize. Needs onInit to be accessed from outside.
+    //used documentation on  http://stackoverflow.com/questions/4225890/jquery-exposing-events for coming up with this.
+    // testing: not sure how to test this. Guess: Needs external unit test.
+
     // override defaults with values of data-* attributes 
     
     var includeTranscript = media.data('include-transcript');

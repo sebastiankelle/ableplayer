@@ -1,66 +1,88 @@
 (function ($) {
-  AblePlayer.prototype.getSupportedLangs = function() {
-    // returns an array of languages for which AblePlayer has translation tables 
-    var langs = ['en','de','es'];
-    return langs;
-  };
+	AblePlayer.prototype.getSupportedLangs = function() {
+		// returns an array of languages for which AblePlayer has translation tables
+		var langs = ['ca','cs','de','en','es','fr','he','id','it','ja','nb','nl','pt-br','sv','tr','zh-tw'];
+		return langs;
+	};
 
-  AblePlayer.prototype.getTranslationText = function() { 
-    // determine language, then get labels and prompts from corresponding translation file (in JSON)
-    // finally, populate this.tt object with JSON data
-    // return true if successful, otherwise false 
-    var gettingText, lang, thisObj, msg; 
+	AblePlayer.prototype.getTranslationText = function() {
 
-    gettingText = $.Deferred(); 
+		// determine language, then get labels and prompts from corresponding translation var
 
-    // override this.lang to language of the web page, if known and supported
-    // otherwise this.lang will continue using default    
-    if (!this.forceLang) {   
-      if ($('body').attr('lang')) { 
-        lang = $('body').attr('lang');
+		var deferred, thisObj, supportedLangs, docLang, msg, translationFile, collapsedLang;
+		deferred = $.Deferred();
+		thisObj = this;
+
+    supportedLangs = this.getSupportedLangs(); // returns an array
+
+    if (this.lang) { // a data-lang attribute is included on the media element
+		  if ($.inArray(this.lang,supportedLangs) === -1) {
+    		// the specified language is not supported
+    		if (this.lang.indexOf('-') == 2) {
+      		// this is a localized lang attribute (e.g., fr-CA)
+      		// try the parent language, given the first two characters
+      		if ($.inArray(this.lang.substring(0,2),supportedLangs) !== -1) {
+            // parent lang is supported. Use that.
+            this.lang = this.lang.substring(0,2);
+          }
+          else {
+      		  // the parent language is not supported either
+      		  // unable to use the specified language
+      		  this.lang = null;
+    		  }
+    		}
+    		else {
+      		// this is not a localized language.
+      		// since it's not supported, we're unable to use it.
+      		this.lang = null;
+        }
       }
-      else if ($('html').attr('lang')) { 
-        lang = $('html').attr('lang');
-      }    
-      if (lang !== this.lang) {
-        msg = 'Language of web page (' + lang +') ';
-        if ($.inArray(lang,this.getSupportedLangs()) !== -1) { 
-          // this is a supported lang
-          msg += ' has a translation table available.';
-          this.lang = lang; 
-        }
-        else { 
-          msg += ' is not currently supported. Using default language (' + this.lang + ')';
-        }
-        if (this.debug) {
-          console.log(msg);
-        }
+    }
+
+    if (!this.lang) {
+      // try the language of the web page, if specified
+      if ($('body').attr('lang')) {
+        docLang = $('body').attr('lang').toLowerCase();
       }
-    } 
-    thisObj = this;
-    // get content of JSON file 
-    $.getJSON(this.translationPath + this.lang + '.js',
-              function(data, textStatus, jqxhr) { 
-                if (textStatus === 'success') { 
-                  thisObj.tt = data;
-                  if (thisObj.debug) { 
-                    console.log('Successfully assigned JSON data to trans');
-                    console.log(thisObj.tt);           
-                  }
-                }
-                else { 
-                  return false; 
-                }
-              }
-             ).then( 
-               function(){ // success 
-                 // resolve deferred variable
-                 gettingText.resolve();  
-               },
-               function() { // failure 
-                 return false; 
-               }
-             );
-    return gettingText.promise(); 
-  };
+      else if ($('html').attr('lang')) {
+        docLang = $('html').attr('lang').toLowerCase();
+		  }
+      else {
+        docLang = null;
+		  }
+		  if (docLang) {
+        if ($.inArray(docLang,supportedLangs) !== -1) {
+          // the document language is supported
+          this.lang = docLang;
+        }
+        else {
+          // the document language is not supported
+          if (docLang.indexOf('-') == 2) {
+            // this is a localized lang attribute (e.g., fr-CA)
+            // try the parent language, given the first two characters
+            if ($.inArray(docLang.substring(0,2),supportedLangs) !== -1) {
+              // the parent language is supported. use that.
+              this.lang = docLang.substring(0,2);
+    		    }
+    		  }
+    		}
+      }
+    }
+
+    if (!this.lang) {
+      // No supported language has been specified by any means
+      // Fallback to English
+      this.lang = 'en';
+    }
+		if (!this.searchLang) {
+			this.searchLang = this.lang;
+		}
+		translationFile = this.rootPath + 'translations/' + this.lang + '.js';
+		$.getJSON(translationFile, function(data) {
+			thisObj.tt = data; 
+			deferred.resolve(); 
+		}); 
+		return deferred.promise();
+	};
+
 })(jQuery);

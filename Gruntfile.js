@@ -22,21 +22,28 @@ module.exports = function(grunt) {
                     'scripts/webvtt.js',
                     'scripts/buildplayer.js',
                     'scripts/track.js',
-                    'scripts/seekbar.js',
+                    'scripts/youtube.js',
+                    'scripts/slider.js',
+                    'scripts/volume.js',
                     'scripts/dialog.js',
                     'scripts/misc.js',
                     'scripts/description.js',
                     'scripts/browser.js',
                     'scripts/control.js',
                     'scripts/caption.js',
+                    'scripts/chapters.js',
                     'scripts/metadata.js',
-                    'scripts/translation.js',
                     'scripts/transcript.js',
                     'scripts/search.js',
                     'scripts/event.js',
                     'scripts/dragdrop.js',
                     'scripts/sign.js',
-                    'scripts/langs.js'
+                    'scripts/langs.js',
+                    'scripts/translation.js',
+                    'scripts/ttml2webvtt.js',
+                    'scripts/JQuery.doWhen.js',
+                    'scripts/vts.js',
+                    'scripts/vimeo.js'
                 ],
                 dest: 'build/<%= pkg.name %>.js'
             },
@@ -69,9 +76,6 @@ module.exports = function(grunt) {
             min: {
                 src  : [
                     'styles/ableplayer.css',
-                    'styles/ableplayer-playlist.css',
-                    'styles/ableplayer-search.css',
-                    'styles/ableplayer-transcript.css'
                 ],
                 dest : 'build/<%= pkg.name %>.min.css',
             },
